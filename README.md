@@ -1,2 +1,2 @@
 # emacs-config
-config files for emacs 
+Config files for emacs 
