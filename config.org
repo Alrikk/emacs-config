@@ -20,7 +20,7 @@
   (setq make-backup-file nil)
   (setq auto-save-default nil)
 #+END_SRC
-* Client functionality
+* Minor settings
 ** Remove bell notification
 #+BEGIN_SRC emacs-lisp
   (setq ring-bell-function 'ignore)
@@ -29,6 +29,11 @@
 #+BEGIN_SRC emacs-lisp
   (when window-system (global-hl-line-mode t))
 #+END_SRC
+** clock
+#+BEGIN_SRC emacs-lisp
+  (setq display-time-24hr-format t)
+  (display-time-mode 1)
+#+END_SRC
 ** beacon
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
@@ -36,7 +41,16 @@
     :init
     (beacon-mode 1))
 #+END_SRC
-** Remove menue and toolbarf   
+** electric
+#+BEGIN_SRC emacs-lisp
+  (setq electric-pair-pairs '(
+			      (?\( . ?\))
+			      (?\[ . ?])
+			      ))
+
+  (electric-pair-mode t)
+#+END_SRC
+** Remove menue and toolbar   
 #+BEGIN_SRC emacs-lisp
   (tool-bar-mode -1)
   (menu-bar-mode -1)
@@ -62,6 +76,10 @@
 ** remove tutrial
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-message t)
+#+END_SRC
+** kill whole line
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-c l k") 'kill-whole-line)
 #+END_SRC
 * IDO
 ** enable ido mode
@@ -96,12 +114,56 @@
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
-* avy
+** always kill current buffer
 #+BEGIN_SRC emacs-lisp
-  (use-package avy
+  (defun kill-curr-buffer ()
+    (interactive)
+    (kill-buffer (current-buffer)))
+  (global-set-key (kbd "C-x k") 'kill-current-buffer)
+#+END_SRC
+* modeline
+** spaceline
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :ensure t
+    :config
+    (require 'spaceline-config)
+    (setq powerline-default-seperator (quote arrow))
+    (spaceline-spacemacs-theme))
+#+END_SRC
+** diminish
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t
+    :init
+  (diminish 'which-key-mode)
+  (diminish 'hungry-delete-mode)
+  (diminish 'subword-mode)
+  (diminish 'beacon-mode)
+  (diminish 'rainbow-mode))
+#+END_SRC
+* dmenue
+#+BEGIN_SRC emacs-lisp
+  (use-package dmenu
     :ensure t
     :bind
-    ("M-s" . avy-goto-char))
+    ("s-SPC" . 'dmenu))
+#+END_SRC
+* symon
+#+BEGIN_SRC emacs-lisp
+  (use-package symon
+    :ensure t
+    :bind
+    ("s-h . symon-mode"))
+#+END_SRC
+* dashboard
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+    :ensure t
+    :config
+    (dashboard-setup-startup-hook)
+    (setq dashboard-items '((recents . 10)))
+    (setq dashboard-banner-logo-title "Hello Alrik!"))
 #+END_SRC
 * config edit/reload
 ** edit
@@ -117,6 +179,21 @@
     (interactive)
     (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
   (global-set-key (kbd "C-c r") 'config-reload)
+#+END_SRC
+* convenient function
+* org
+** basic config
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-window-setup 'current-window)
+  (add-to-list 'org-structure-template-alist
+	       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+#+END_SRC
+** org bullets
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :config
+      (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 #+END_SRC
 * switch-window
 #+BEGIN_SRC emacs-lisp
@@ -148,4 +225,35 @@
     (balance-windows)
     (other-window 1))
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+#+END_SRC
+* rainbow
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :ensure t
+    :init (rainbow-mode 1))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :init
+    (rainbow-delimiters-mode 1))
+#+END_SRC
+* avy
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind
+    ("M-s" . avy-goto-char)
+    ("C-c l c" . avy-copy-line))
+#+END_SRC
+* auto completion
+** company
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :ensure t
+    :init
+    (add-hook 'after-init-hook 'global-company-mode)
+    (global-company-mode t)
+    (setq company-minimum-prefix-length 1)
+    (setq company-idle-delay 0))
 #+END_SRC
